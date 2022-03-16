@@ -4,6 +4,7 @@
 
 #include "resistor-combination.h"
 #include "../helper.h"
+#include "../list.h"
 
 int main(int argc, char ** argv) {
 
@@ -18,6 +19,12 @@ int main(int argc, char ** argv) {
 
 	printf("Desired value: %f\n", desired_value);
 
+	// create LL for valid resistor combinations
+	ResistorLL * valid = (ResistorLL *) malloc(sizeof(ResistorLL));
+	valid->head = (ResistorNode *) malloc(sizeof(ResistorNode));
+	valid->head->next = NULL;
+	ResistorNode * head = valid->head;
+
 	// series only
 	for (int i = 0; i < (sizeof(E3) / sizeof(E3[0])); i++) { // one resistor deep
 
@@ -27,6 +34,20 @@ int main(int argc, char ** argv) {
 
 				// check if current combination of 3 resistors is within 10% tolerance
 				if (fabs((E3[i] + E3[j] + E3[k] - desired_value) / desired_value) <= 0.1) {
+
+					if (head == NULL) {
+						head = (ResistorNode *) malloc(sizeof(ResistorNode));
+						head->next = NULL;
+					}
+
+					head->values = malloc(3 * sizeof(double));
+					head->values[0] = E3[i];
+					head->values[1] = E3[j];
+					head->values[2] = E3[k];
+					qsort(head->values, 3, sizeof(double), dcompare);
+					printListNode(head);
+					head = head->next;
+
 					printf("Value found (3): %f + %f + %f = %f (%f)\n", E3[i], E3[j], E3[k], (E3[i] + E3[j] + E3[k]), fabs((E3[i] + E3[j] + E3[k] - desired_value) / desired_value));
 				}
 			}
@@ -42,4 +63,16 @@ int main(int argc, char ** argv) {
 			printf("Value found (1): %f = %f (%f)\n", E3[i], (E3[i]), fabs((E3[i] - desired_value) / desired_value));
 		}
 	}
+
+	printListNode(valid->head);
+
+	// free memory
+	while (head->next != NULL) {
+
+		ResistorNode * temp = head;
+		head = head->next;
+		free(temp);
+	}
+	free(head);
+	free(valid);
 }
