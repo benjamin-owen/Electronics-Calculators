@@ -1,12 +1,12 @@
-CFLAGS = -std=c99 -g -Wall -Wshadow --pedantic -Wvla -Werror
+CFLAGS = -std=c99 -g -Wall -Wshadow --pedantic -Wvla
 TESTS = #-DDEBUG
 GCC = gcc $(CFLAGS) $(TESTS)
 EXEC = calc
 OBJS =  hw14.o huffman.o output.o utility.o
 VALGRIND = valgrind --tool=memcheck --leak-check=yes --verbose
 
-resistor-combination: resistor-combination/resistor-combination.o helper.o
-	$(GCC) resistor-combination.o helper.o -o $(EXEC)
+resistor-combination: resistor-combination/resistor-combination.o helper.o list.o
+	$(GCC) resistor-combination.o helper.o list.o -o $(EXEC)
 
 # $(EXEC): $(OBJS) huffman.h output.h utility.h
 # 	$(GCC) $(OBJS) -o $(EXEC) 

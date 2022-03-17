@@ -15,4 +15,10 @@ typedef struct ResistorLL {
 // print LL
 void printListNode(ResistorNode * head);
 
+// build node
+ResistorNode * buildNode(double * values);
+
+// insert unique node
+void insertUniqueNode(ResistorNode ** head, ResistorNode ** node_to_insert);
+
 #endif

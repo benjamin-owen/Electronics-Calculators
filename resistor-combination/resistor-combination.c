@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
+#include <string.h>
 
 #include "resistor-combination.h"
 #include "../helper.h"
@@ -20,10 +21,14 @@ int main(int argc, char ** argv) {
 	printf("Desired value: %f\n", desired_value);
 
 	// create LL for valid resistor combinations
-	ResistorLL * valid = (ResistorLL *) malloc(sizeof(ResistorLL));
-	valid->head = (ResistorNode *) malloc(sizeof(ResistorNode));
-	valid->head->next = NULL;
-	ResistorNode * head = valid->head;
+	// ResistorLL * valid = malloc(sizeof(ResistorLL));
+	// valid->head = NULL;
+	// ResistorNode * head = (ResistorNode *) malloc(sizeof(ResistorNode));
+	// valid->head->values = malloc(sizeof(double));
+	// valid->head->values = 0;
+	ResistorNode * head = NULL;
+	ResistorNode * curr = NULL;
+	// ResistorNode * p = NULL;
 
 	// series only
 	for (int i = 0; i < (sizeof(E3) / sizeof(E3[0])); i++) { // one resistor deep
@@ -34,21 +39,46 @@ int main(int argc, char ** argv) {
 
 				// check if current combination of 3 resistors is within 10% tolerance
 				if (fabs((E3[i] + E3[j] + E3[k] - desired_value) / desired_value) <= 0.1) {
-
-					if (head == NULL) {
-						head = (ResistorNode *) malloc(sizeof(ResistorNode));
-						head->next = NULL;
-					}
-
-					head->values = malloc(3 * sizeof(double));
-					head->values[0] = E3[i];
-					head->values[1] = E3[j];
-					head->values[2] = E3[k];
-					qsort(head->values, 3, sizeof(double), dcompare);
-					printListNode(head);
-					head = head->next;
-
+					
 					printf("Value found (3): %f + %f + %f = %f (%f)\n", E3[i], E3[j], E3[k], (E3[i] + E3[j] + E3[k]), fabs((E3[i] + E3[j] + E3[k] - desired_value) / desired_value));
+
+					// create array with sorted resistor values
+					double * values = malloc(3 * sizeof(double));
+					values[0] = E3[i];
+					values[1] = E3[j];
+					values[2] = E3[k];
+					qsort(values, 3, sizeof(double), dcompare);
+
+					// create node with found values
+					curr = buildNode(values);
+					
+					printListNode(curr);
+					printf("here3\n");
+					// insertUniqueNode(&head, &curr);
+					if (head == NULL) {
+
+						printf("null\n");
+						head = curr;
+
+					} else {
+
+						printf("not null");
+						int skip = 0;
+						ResistorNode * p = head;
+						while (p->next != NULL) {
+							// if (p->values[0] == curr->values[0]) {
+							// 	skip = 1;
+							// 	printf("same\n");
+							// }
+							p = p->next;
+						}
+						
+						if (skip == 0) p->next = curr;
+					}
+					printf("here4\n");
+					// printf("%f\n", head->values[0]);
+					// printf("here5\n");
+					// printf("%p\n", &head);
 				}
 			}
 
@@ -64,7 +94,11 @@ int main(int argc, char ** argv) {
 		}
 	}
 
-	printListNode(valid->head);
+	if (head == NULL)
+		printf("NULL\n");
+	printf("here8\n");
+	printListNode(head);
+	printf("here9\n");
 
 	// free memory
 	while (head->next != NULL) {
@@ -74,5 +108,5 @@ int main(int argc, char ** argv) {
 		free(temp);
 	}
 	free(head);
-	free(valid);
+	// free(valid);
 }
